@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Proyecto de Feria 🚀</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    user-select:none;
+    -webkit-user-select:none;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#020617;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    color:white;
+}
+
+/* =========================
+   PANTALLAS
+========================= */
+
+.pantalla{
+    position:absolute;
+    inset:0;
+    display:none;
+    width:100%;
+    height:100%;
+}
+
+.pantalla.activa{
+    display:flex;
+}
+
+/* =========================
+   INICIO
+========================= */
+
+#inicio{
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+    background:
+        radial-gradient(circle at 20% 20%,#172554 0,transparent 25%),
+        radial-gradient(circle at 80% 70%,#312e81 0,transparent 25%),
+        #020617;
+}
+
+#inicio h1{
+    font-size:clamp(35px,8vw,75px);
+    margin-bottom:15px;
+    text-shadow:0 0 20px #38bdf8;
+}
+
+#inicio p{
+    font-size:clamp(18px,4vw,30px);
+    margin-bottom:30px;
+}
+
+.boton{
+    border:0;
+    border-radius:18px;
+    padding:15px 30px;
+    margin:7px;
+    font-size:20px;
+    font-weight:bold;
+    color:white;
+    background:#2563eb;
+    box-shadow:0 5px 15px rgba(0,0,0,.4);
+}
+
+.boton:active{
+    transform:scale(.94);
+}
+
+/* =========================
+   JUEGO
+========================= */
+
+#juego{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 15% 25%,white 1px,transparent 2px),
+        radial-gradient(circle at 45% 75%,white 1px,transparent 2px),
+        radial-gradient(circle at 75% 35%,white 1px,transparent 2px),
+        radial-gradient(circle at 90% 80%,white 1px,transparent 2px),
+        linear-gradient(110deg,#020617,#0f172a,#020617);
+    background-size:180px 180px,230px 230px,300px 300px,260px 260px,100% 100%;
+    animation:fondo 12s linear infinite;
+}
+
+@keyframes fondo{
+    from{
+        background-position:0 0,0 0,0 0,0 0,0 0;
+    }
+    to{
+        background-position:-180px 120px,-230px 100px,-300px 160px,-260px 90px,0 0;
+    }
+}
+
+/* HUD */
+
+#hud{
+    position:absolute;
+    top:8px;
+    left:8px;
+    right:8px;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    pointer-events:none;
+}
+
+.info{
+    background:rgba(0,0,0,.55);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:12px;
+    padding:7px 12px;
+    font-size:clamp(13px,2.5vw,21px);
+    backdrop-filter:blur(5px);
+}
+
+#pausa{
+    pointer-events:auto;
+    border:0;
+    border-radius:12px;
+    padding:8px 13px;
+    font-size:20px;
+    background:rgba(255,255,255,.15);
+    color:white;
+}
+
+/* =========================
+   CONTROL
+========================= */
+
+#zonaControl{
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:40%;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-right:2px dashed rgba(255,255,255,.12);
+    touch-action:none;
+}
+
+#ayudaControl{
+    color:rgba(255,255,255,.4);
+    text-align:center;
+    font-size:clamp(14px,3vw,23px);
+    padding:15px;
+}
+
+#cohete{
+    position:absolute;
+    left:10%;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:clamp(42px,7vw,75px);
+    z-index:20;
+    transition:top .05s linear;
+    filter:drop-shadow(0 0 10px #38bdf8);
+    animation:coheteFlota .5s infinite alternate;
+}
+
+@keyframes coheteFlota{
+    from{
+        transform:translateY(-50%) translateX(0);
+    }
+    to{
+        transform:translateY(-53%) translateX(5px);
+    }
+}
+
+.coheteGolpe{
+    animation:golpe .45s;
+}
+
+@keyframes golpe{
+    0%{transform:translateY(-50%) scale(1);}
+    25%{transform:translateY(-50%) scale(1.4) rotate(-12deg);}
+    50%{transform:translateY(-50%) scale(.7) rotate(12deg);}
+    100%{transform:translateY(-50%) scale(1);}
+}
+
+/* =========================
+   OBJETOS
+========================= */
+
+.meteorito,
+.estrella,
+.escudo,
+.velocidad{
+    position:absolute;
+    z-index:10;
+    pointer-events:none;
+}
+
+.meteorito{
+    font-size:clamp(35px,6vw,65px);
+    filter:drop-shadow(0 0 5px rgba(255,100,0,.7));
+}
+
+.meteorito.grande{
+    font-size:clamp(60px,10vw,105px);
+}
+
+.meteorito.rapido{
+    filter:drop-shadow(0 0 12px red);
+}
+
+.meteorito.zigzag{
+    filter:drop-shadow(0 0 12px #c084fc);
+}
+
+.estrella{
+    font-size:clamp(30px,5vw,55px);
+    filter:drop-shadow(0 0 12px gold);
+    animation:brillar .5s infinite alternate;
+}
+
+@keyframes brillar{
+    from{transform:scale(.85) rotate(0deg);}
+    to{transform:scale(1.15) rotate(15deg);}
+}
+
+.escudo{
+    font-size:clamp(35px,6vw,60px);
+    filter:drop-shadow(0 0 15px #22d3ee);
+    animation:escudoAnim .7s infinite alternate;
+}
+
+@keyframes escudoAnim{
+    from{transform:scale(.9);}
+    to{transform:scale(1.15);}
+}
+
+.velocidad{
+    font-size:clamp(35px,6vw,60px);
+    filter:drop-shadow(0 0 15px #facc15);
+    animation:velocidadAnim .4s infinite alternate;
+}
+
+@keyframes velocidadAnim{
+    from{transform:scale(.9);}
+    to{transform:scale(1.2);}
+}
+
+/* =========================
+   EXPLOSIÓN
+========================= */
+
+.explosion{
+    position:absolute;
+    z-index:200;
+    font-size:65px;
+    pointer-events:none;
+    animation:explosion .6s forwards;
+}
+
+@keyframes explosion{
+    0%{
+        transform:scale(.3);
+        opacity:1;
+    }
+    60%{
+        transform:scale(1.5) rotate(15deg);
+        opacity:1;
+    }
+    100%{
+        transform:scale(2.3);
+        opacity:0;
+    }
+}
+
+.particula{
+    position:absolute;
+    font-size:20px;
+    animation:particula .6s forwards;
+}
+
+@keyframes particula{
+    to{
+        transform:translate(var(--x),var(--y));
+        opacity:0;
+    }
+}
+
+/* =========================
+   MENSAJES
+========================= */
+
+#mensaje{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:300;
+    padding:15px 25px;
+    border-radius:15px;
+    background:rgba(0,0,0,.75);
+    font-size:clamp(20px,5vw,35px);
+    font-weight:bold;
+    text-align:center;
+    opacity:0;
+    pointer-events:none;
+}
+
+.mostrarMensaje{
+    animation:mensajeAnim 1.3s forwards;
+}
+
+@keyframes mensajeAnim{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.6);}
+    20%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
+    80%{opacity:1;}
+    100%{opacity:0;transform:translate(-50%,-60%) scale(1);}
+}
+
+/* =========================
+   PAUSA
+========================= */
+
+#pantallaPausa{
+    position:absolute;
+    inset:0;
+    z-index:500;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    background:rgba(0,0,0,.75);
+}
+
+#pantallaPausa.activa{
+    display:flex;
+}
+
+#pantallaPausa h2{
+    font-size:50px;
+    margin-bottom:20px;
+}
+
+/* =========================
+   RECORDS
+========================= */
+
+#records{
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+    background:
+        radial-gradient(circle,#172554,#020617 70%);
+}
+
+#records h2{
+    font-size:clamp(30px,7vw,55px);
+    margin-bottom:25px;
+}
+
+#listaRecords{
+    width:min(90%,500px);
+    margin-bottom:25px;
+}
+
+.record{
+    display:flex;
+    justify-content:space-between;
+    background:rgba(255,255,255,.1);
+    padding:12px 18px;
+    margin:7px;
+    border-radius:12px;
+    font-size:20px;
+}
+
+.sinRecord{
+    opacity:.6;
+    padding:20px;
+}
+
+/* =========================
+   GAME OVER
+========================= */
+
+#gameOver{
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+    background:
+        radial-gradient(circle at center,#450a0a,#020617 70%);
+}
+
+#gameOver h2{
+    font-size:clamp(35px,8vw,65px);
+    margin-bottom:10px;
+}
+
+#resultado{
+    font-size:clamp(20px,5vw,30px);
+    margin-bottom:15px;
+}
+
+#nuevoRecord{
+    color:#facc15;
+    font-size:clamp(20px,5vw,30px);
+    font-weight:bold;
+    margin-bottom:15px;
+    display:none;
+    animation:recordBrillo .7s infinite alternate;
+}
+
+@keyframes recordBrillo{
+    from{transform:scale(1);}
+    to{transform:scale(1.08);}
+}
+
+/* =========================
+   VERTICAL
+========================= */
+
+#vertical{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:#020617;
+    color:white;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:30px;
+}
+
+#vertical h2{
+    font-size:35px;
+}
+
+@media (orientation:portrait){
+    #vertical{
+        display:flex;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     AVISO VERTICAL
+========================= -->
+<div id="vertical">
+    <div>
+        <h2>📱↔️</h2>
+        <h2>Gira tu celular</h2>
+        <p>Este juego se juega en horizontal.</p>
+    </div>
+</div>
+
+<!-- =========================
+     INICIO
+========================= -->
+<section id="inicio" class="pantalla activa">
+
+    <h1>🚀 Proyecto de Feria</h1>
+
+    <p>🌌 Misión: Sobrevivir al campo de meteoritos</p>
+
+    <button class="boton" onclick="iniciarJuego()">
+        🚀 Comenzar
+    </button>
+
+    <button class="boton" onclick="mostrarRecords()">
+        🏆 Récords
+    </button>
+
+</section>
+
+<!-- =========================
+     JUEGO
+========================= -->
+<section id="juego" class="pantalla">
+
+    <div id="hud">
+
+        <div class="info">
+            ⭐ <span id="puntos">0</span>
+        </div>
+
+        <div class="info">
+            ❤️ <span id="vidas">3</span>
+        </div>
+
+        <div class="info">
+            🌌 Nivel <span id="nivel">1</span>
+        </div>
+
+        <button id="pausa" onclick="alternarPausa()">⏸️</button>
+
+    </div>
+
+    <div id="zonaControl">
+        <div id="ayudaControl">
+            👆<br>
+            Mueve aquí<br>
+            el cohete
+        </div>
+    </div>
+
+    <div id="cohete">🚀</div>
+
+    <div id="mensaje"></div>
+
+    <div id="pantallaPausa">
+        <h2>⏸️ PAUSA</h2>
+        <button class="boton" onclick="alternarPausa()">
+            ▶️ Continuar
+        </button>
+    </div>
+
+</section>
+
+<!-- =========================
+     RECORDS
+========================= -->
+<section id="records" class="pantalla">
+
+    <h2>🏆 Récords</h2>
+
+    <div id="listaRecords"></div>
+
+    <button class="boton" onclick="volverInicio()">
+        🏠 Inicio
+    </button>
+
+</section>
+
+<!-- =========================
+     GAME OVER
+========================= -->
+<section id="gameOver" class="pantalla">
+
+    <h2>💥 GAME OVER</h2>
+
+    <div id="resultado">
+        Puntuación: 0
+    </div>
+
+    <div id="nuevoRecord">
+        🏆 ¡NUEVO RÉCORD!
+    </div>
+
+    <div id="listaRecordsFinal"></div>
+
+    <button class="boton" onclick="iniciarJuego()">
+        🔄 Reintentar
+    </button>
+
+    <button class="boton" onclick="volverInicio()">
+        🏠 Inicio
+    </button>
+
+</section>
+
+<script>
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+const inicio = document.getElementById("inicio");
+const juego = document.getElementById("juego");
+const recordsPantalla = document.getElementById("records");
+const gameOverPantalla = document.getElementById("gameOver");
+
+const cohete = document.getElementById("cohete");
+const zonaControl = document.getElementById("zonaControl");
+
+const puntosTexto = document.getElementById("puntos");
+const vidasTexto = document.getElementById("vidas");
+const nivelTexto = document.getElementById("nivel");
+
+const mensaje = document.getElementById("mensaje");
+
+let jugando = false;
+let pausado = false;
+
+let puntos = 0;
+let vidas = 3;
+let nivel = 1;
+
+let coheteY = 50;
+
+let meteoritos = [];
+let objetosEspeciales = [];
+
+let animacion = null;
+
+let tiempoJuego = 0;
+let ultimoTiempo = 0;
+
+let proximoMeteorito = 0;
+let proximaEstrella = 5000;
+let proximoEscudo = 10000;
+let proximaVelocidad = 14000;
+
+let proximoPunto = 500;
+
+let escudoActivo = false;
+let escudoHasta = 0;
+
+let velocidadActiva = false;
+let velocidadHasta = 0;
+
+let registros = [];
+
+/* =====================================================
+   SONIDOS
+===================================================== */
+
+let audioContext = null;
+
+function iniciarAudio(){
+
+    if(!audioContext){
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    if(audioContext.state === "suspended"){
+        audioContext.resume();
+    }
+}
+
+function sonido(tipo){
+
+    try{
+
+        iniciarAudio();
+
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+
+        let frecuencia = 440;
+        let duracion = .15;
+
+        if(tipo === "estrella"){
+            frecuencia = 800;
+            duracion = .12;
+        }
+
+        if(tipo === "golpe"){
+            frecuencia = 100;
+            duracion = .25;
+        }
+
+        if(tipo === "gameover"){
+            frecuencia = 160;
+            duracion = .7;
+        }
+
+        if(tipo === "escudo"){
+            frecuencia = 600;
+            duracion = .25;
+        }
+
+        if(tipo === "velocidad"){
+            frecuencia = 1000;
+            duracion = .2;
+        }
+
+        if(tipo === "record"){
+            frecuencia = 1200;
+            duracion = .4;
+        }
+
+        osc.frequency.value = frecuencia;
+
+        gain.gain.setValueAtTime(.15,audioContext.currentTime);
+
+        gain.gain.exponentialRampToValueAtTime(
+            .001,
+            audioContext.currentTime + duracion
+        );
+
+        osc.start();
+
+        osc.stop(
+            audioContext.currentTime + duracion
+        );
+
+    }catch(e){}
+}
+
+/* =====================================================
+   PANTALLAS
+===================================================== */
+
+function ocultarPantallas(){
+
+    inicio.classList.remove("activa");
+    juego.classList.remove("activa");
+    recordsPantalla.classList.remove("activa");
+    gameOverPantalla.classList.remove("activa");
+}
+
+function mostrarRecords(){
+
+    ocultarPantallas();
+
+    recordsPantalla.classList.add("activa");
+
+    actualizarRecords();
+}
+
+function volverInicio(){
+
+    detenerJuego();
+
+    ocultarPantallas();
+
+    inicio.classList.add("activa");
+}
+
+/* =====================================================
+   INICIAR JUEGO
+===================================================== */
+
+function iniciarJuego(){
+
+    iniciarAudio();
+
+    detenerJuego();
+
+    ocultarPantallas();
+
+    juego.classList.add("activa");
+
+    puntos = 0;
+    vidas = 3;
+    nivel = 1;
+
+    coheteY = 50;
+
+    tiempoJuego = 0;
+    ultimoTiempo = performance.now();
+
+    proximoMeteorito = 500;
+    proximaEstrella = 5000;
+    proximoEscudo = 10000;
+    proximaVelocidad = 14000;
+
+    proximoPunto = 500;
+
+    escudoActivo = false;
+    velocidadActiva = false;
+
+    meteoritos = [];
+    objetosEspeciales = [];
+
+    cohete.style.top = coheteY + "%";
+
+    document.querySelectorAll(
+        ".meteorito,.estrella,.escudo,.velocidad,.explosion"
+    ).forEach(e => e.remove());
+
+    actualizarHUD();
+
+    jugando = true;
+    pausado = false;
+
+    document.getElementById("pantallaPausa")
+        .classList.remove("activa");
+
+    document.getElementById("pausa").textContent = "⏸️";
+
+    animacion = requestAnimationFrame(bucle);
+}
+
+/* =====================================================
+   DETENER
+===================================================== */
+
+function detenerJuego(){
+
+    jugando = false;
+    pausado = false;
+
+    if(animacion){
+        cancelAnimationFrame(animacion);
+        animacion = null;
+    }
+}
+
+/* =====================================================
+   BUCLE PRINCIPAL
+===================================================== */
+
+function bucle(ahora){
+
+    if(!jugando) return;
+
+    if(pausado){
+
+        ultimoTiempo = ahora;
+
+        animacion = requestAnimationFrame(bucle);
+
+        return;
+    }
+
+    let delta = ahora - ultimoTiempo;
+
+    if(delta > 50) delta = 50;
+
+    ultimoTiempo = ahora;
+
+    tiempoJuego += delta;
+
+    /* PUNTOS */
+
+    if(tiempoJuego >= proximoPunto){
+
+        puntos++;
+
+        proximoPunto += 500;
+
+        comprobarNivel();
+
+        actualizarHUD();
+    }
+
+    /* METEORITOS */
+
+    if(tiempoJuego >= proximoMeteorito){
+
+        crearMeteorito();
+
+        proximoMeteorito =
+            tiempoJuego + obtenerIntervaloMeteoritos();
+    }
+
+    /* ESTRELLA */
+
+    if(tiempoJuego >= proximaEstrella){
+
+        crearEspecial("estrella");
+
+        proximaEstrella =
+            tiempoJuego + 7000 + Math.random()*4000;
+    }
+
+    /* ESCUDO */
+
+    if(tiempoJuego >= proximoEscudo){
+
+        crearEspecial("escudo");
+
+        proximoEscudo =
+            tiempoJuego + 12000 + Math.random()*5000;
+    }
+
+    /* VELOCIDAD */
+
+    if(tiempoJuego >= proximaVelocidad){
+
+        crearEspecial("velocidad");
+
+        proximaVelocidad =
+            tiempoJuego + 15000 + Math.random()*5000;
+    }
+
+    /* EFECTOS */
+
+    if(escudoActivo && tiempoJuego >= escudoHasta){
+
+        escudoActivo = false;
+
+        mostrarMensaje("🛡️ Escudo terminado");
+    }
+
+    if(velocidadActiva && tiempoJuego >= velocidadHasta){
+
+        velocidadActiva = false;
+
+        mostrarMensaje("⚡ Velocidad normal");
+    }
+
+    moverMeteoritos(delta);
+    moverEspeciales(delta);
+
+    animacion = requestAnimationFrame(bucle);
+}
+
+/* =====================================================
+   DIFICULTAD
+===================================================== */
+
+function comprobarNivel(){
+
+    const nuevoNivel =
+        Math.min(5,Math.floor(puntos / 20) + 1);
+
+    if(nuevoNivel !== nivel){
+
+        nivel = nuevoNivel;
+
+        mostrarMensaje("🌌 ¡NIVEL " + nivel + "!");
+
+        sonido("record");
+    }
+}
+
+function obtenerIntervaloMeteoritos(){
+
+    return Math.max(
+        650,
+        950 - ((nivel - 1) * 55)
+    );
+}
+
+function velocidadMeteorito(){
+
+    let velocidad =
+        2.7 + ((nivel - 1) * .65);
+
+    if(velocidadActiva){
+        velocidad *= 1.15;
+    }
+
+    return velocidad;
+}
+
+/* =====================================================
+   CREAR METEORITO
+===================================================== */
+
+function crearMeteorito(){
+
+    const meteorito =
+        document.createElement("div");
+
+    meteorito.className = "meteorito";
+
+    const tipos = [
+        "☄️",
+        "🪨",
+        "🌑",
+        "🔥",
+        "💫",
+        "🌋"
+    ];
+
+    meteorito.textContent =
+        tipos[Math.floor(Math.random()*tipos.length)];
+
+    const grande =
+        Math.random() < 0.10;
+
+    const rapido =
+        Math.random() < 0.12;
+
+    const zigzag =
+        Math.random() < 0.15;
+
+    if(grande){
+        meteorito.classList.add("grande");
+    }
+
+    if(rapido){
+        meteorito.classList.add("rapido");
+    }
+
+    if(zigzag){
+        meteorito.classList.add("zigzag");
+    }
+
+    const altoJuego =
+        juego.clientHeight;
+
+    const margenSuperior = 80;
+    const margenInferior = 40;
+
+    let y =
+        margenSuperior +
+        Math.random() *
+        Math.max(
+            50,
+            altoJuego -
+            margenSuperior -
+            margenInferior
+        );
+
+    meteorito.style.left =
+        juego.clientWidth + 40 + "px";
+
+    meteorito.style.top =
+        y + "px";
+
+    juego.appendChild(meteorito);
+
+    meteoritos.push({
+
+        elemento:meteorito,
+
+        x:juego.clientWidth + 40,
+
+        y:y,
+
+        velocidad:
+            velocidadMeteorito() *
+            (rapido ? 1.6 : 1),
+
+        grande:grande,
+
+        zigzag:zigzag,
+
+        fase:Math.random()*Math.PI*2
+
+    });
+}
+
+/* =====================================================
+   MOVER METEORITOS
+===================================================== */
+
+function moverMeteoritos(delta){
+
+    const factor =
+        delta / 16.67;
+
+    for(let i=meteoritos.length-1;i>=0;i--){
+
+        const m = meteoritos[i];
+
+        m.x -=
+            m.velocidad *
+            factor;
+
+        if(m.zigzag){
+
+            m.y +=
+                Math.sin(
+                    (tiempoJuego/160) +
+                    m.fase
+                ) * 1.7 * factor;
+
+            const limiteSuperior = 80;
+            const limiteInferior =
+                juego.clientHeight - 50;
+
+            if(m.y < limiteSuperior)
+                m.y = limiteSuperior;
+
+            if(m.y > limiteInferior)
+                m.y = limiteInferior;
+        }
+
+        m.elemento.style.left =
+            m.x + "px";
+
+        m.elemento.style.top =
+            m.y + "px";
+
+        if(colision(m.elemento)){
+
+            eliminarMeteorito(i);
+
+            choqueMeteorito(
+                m.x,
+                m.y
+            );
+
+            continue;
+        }
+
+        if(m.x < -150){
+
+            m.elemento.remove();
+
+            meteoritos.splice(i,1);
+        }
+    }
+}
+
+/* =====================================================
+   ESPECIALES
+===================================================== */
+
+function crearEspecial(tipo){
+
+    const objeto =
+        document.createElement("div");
+
+    objeto.className = tipo;
+
+    if(tipo === "estrella"){
+        objeto.textContent = "⭐";
+    }
+
+    if(tipo === "escudo"){
+        objeto.textContent = "🛡️";
+    }
+
+    if(tipo === "velocidad"){
+        objeto.textContent = "⚡";
+    }
+
+    objeto.style.left =
+        (juego.clientWidth + 40) + "px";
+
+    const y =
+        90 +
+        Math.random() *
+        Math.max(
+            50,
+            juego.clientHeight - 150
+        );
+
+    objeto.style.top =
+        y + "px";
+
+    juego.appendChild(objeto);
+
+    objetosEspeciales.push({
+
+        elemento:objeto,
+
+        tipo:tipo,
+
+        x:juego.clientWidth + 40,
+
+        y:y,
+
+        velocidad:2.2
+
+    });
+}
+
+function moverEspeciales(delta){
+
+    const factor =
+        delta / 16.67;
+
+    for(let i=objetosEspeciales.length-1;i>=0;i--){
+
+        const o =
+            objetosEspeciales[i];
+
+        o.x -=
+            o.velocidad *
+            factor;
+
+        o.elemento.style.left =
+            o.x + "px";
+
+        if(colision(o.elemento)){
+
+            recogerEspecial(o);
+
+            o.elemento.remove();
+
+            objetosEspeciales.splice(i,1);
+
+            continue;
+        }
+
+        if(o.x < -100){
+
+            o.elemento.remove();
+
+            objetosEspeciales.splice(i,1);
+        }
+    }
+}
+
+/* =====================================================
+   RECOGER ESPECIALES
+===================================================== */
+
+function recogerEspecial(o){
+
+    if(o.tipo === "estrella"){
+
+        puntos += 10;
+
+        sonido("estrella");
+
+        mostrarMensaje("⭐ +10 puntos");
+
+        comprobarNivel();
+
+        actualizarHUD();
+    }
+
+    if(o.tipo === "escudo"){
+
+        escudoActivo = true;
+
+        escudoHasta =
+            tiempoJuego + 5000;
+
+        sonido("escudo");
+
+        mostrarMensaje("🛡️ ¡ESCUDO ACTIVADO!");
+    }
+
+    if(o.tipo === "velocidad"){
+
+        velocidadActiva = true;
+
+        velocidadHasta =
+            tiempoJuego + 5000;
+
+        sonido("velocidad");
+
+        mostrarMensaje("⚡ ¡VELOCIDAD!");
+    }
+}
+
+/* =====================================================
+   COLISIÓN
+===================================================== */
+
+function colision(elemento){
+
+    const r =
+        elemento.getBoundingClientRect();
+
+    const c =
+        cohete.getBoundingClientRect();
+
+    const margen = 12;
+
+    return !(
+        r.right < c.left + margen ||
+        r.left > c.right - margen ||
+        r.bottom < c.top + margen ||
+        r.top > c.bottom - margen
+    );
+}
+
+/* =====================================================
+   CHOQUE
+===================================================== */
+
+function choqueMeteorito(x,y){
+
+    crearExplosion(
+        x + 30,
+        y + 30
+    );
+
+    sonido("golpe");
+
+    if(escudoActivo){
+
+        mostrarMensaje("🛡️ ¡El escudo te protegió!");
+
+        return;
+    }
+
+    vidas--;
+
+    actualizarHUD();
+
+    cohete.classList.remove("coheteGolpe");
+
+    void cohete.offsetWidth;
+
+    cohete.classList.add("coheteGolpe");
+
+    mostrarMensaje("💥 ¡Cuidado!");
+
+    if(vidas <= 0){
+
+        terminarJuego();
+    }
+}
+
+/* =====================================================
+   EXPLOSIÓN
+===================================================== */
+
+function crearExplosion(x,y){
+
+    const explosion =
+        document.createElement("div");
+
+    explosion.className =
+        "explosion";
+
+    explosion.textContent = "💥";
+
+    explosion.style.left =
+        x + "px";
+
+    explosion.style.top =
+        y + "px";
+
+    juego.appendChild(explosion);
+
+    const emojis =
+        ["✨","💫","⭐","🔥"];
+
+    for(let i=0;i<6;i++){
+
+        const p =
+            document.createElement("span");
+
+        p.className =
+            "particula";
+
+        p.textContent =
+            emojis[
+                Math.floor(
+                    Math.random() *
+                    emojis.length
+                )
+            ];
+
+        p.style.left = "30px";
+        p.style.top = "30px";
+
+        p.style.setProperty(
+            "--x",
+            ((Math.random()-.5)*150) + "px"
+        );
+
+        p.style.setProperty(
+            "--y",
+            ((Math.random()-.5)*150) + "px"
+        );
+
+        explosion.appendChild(p);
+    }
+
+    setTimeout(
+        ()=>explosion.remove(),
+        700
+    );
+}
+
+/* =====================================================
+   ELIMINAR METEORITO
+===================================================== */
+
+function eliminarMeteorito(i){
+
+    if(meteoritos[i]){
+
+        meteoritos[i].elemento.remove();
+
+        meteoritos.splice(i,1);
+    }
+}
+
+/* =====================================================
+   HUD
+===================================================== */
+
+function actualizarHUD(){
+
+    puntosTexto.textContent =
+        puntos;
+
+    vidasTexto.textContent =
+        vidas;
+
+    nivelTexto.textContent =
+        nivel;
+}
+
+/* =====================================================
+   MENSAJES
+===================================================== */
+
+function mostrarMensaje(texto){
+
+    mensaje.textContent =
+        texto;
+
+    mensaje.classList.remove(
+        "mostrarMensaje"
+    );
+
+    void mensaje.offsetWidth;
+
+    mensaje.classList.add(
+        "mostrarMensaje"
+    );
+}
+
+/* =====================================================
+   PAUSA
+===================================================== */
+
+function alternarPausa(){
+
+    if(!jugando) return;
+
+    pausado = !pausado;
+
+    const pantalla =
+        document.getElementById(
+            "pantallaPausa"
+        );
+
+    const boton =
+        document.getElementById(
+            "pausa"
+        );
+
+    if(pausado){
+
+        pantalla.classList.add("activa");
+
+        boton.textContent = "▶️";
+
+    }else{
+
+        pantalla.classList.remove("activa");
+
+        boton.textContent = "⏸️";
+
+        ultimoTiempo =
+            performance.now();
+    }
+}
+
+/* =====================================================
+   CONTROL TÁCTIL
+===================================================== */
+
+function moverCohete(evento){
+
+    if(!jugando || pausado)
+        return;
+
+    const rect =
+        zonaControl.getBoundingClientRect();
+
+    let y;
+
+    if(evento.touches){
+
+        y =
+            evento.touches[0].clientY -
+            rect.top;
+
+    }else{
+
+        y =
+            evento.clientY -
+            rect.top;
+    }
+
+    let porcentaje =
+        (y / rect.height) * 100;
+
+    porcentaje =
+        Math.max(
+            8,
+            Math.min(92,porcentaje)
+        );
+
+    coheteY =
+        porcentaje;
+
+    cohete.style.top =
+        coheteY + "%";
+}
+
+zonaControl.addEventListener(
+    "touchstart",
+    moverCohete,
+    {passive:false}
+);
+
+zonaControl.addEventListener(
+    "touchmove",
+    function(e){
+
+        e.preventDefault();
+
+        moverCohete(e);
+
+    },
+    {passive:false}
+);
+
+zonaControl.addEventListener(
+    "mousedown",
+    moverCohete
+);
+
+zonaControl.addEventListener(
+    "mousemove",
+    function(e){
+
+        if(e.buttons){
+            moverCohete(e);
+        }
+
+    }
+);
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+function terminarJuego(){
+
+    jugando = false;
+
+    if(animacion){
+
+        cancelAnimationFrame(
+            animacion
+        );
+
+        animacion = null;
+    }
+
+    sonido("gameover");
+
+    registrarPuntuacion();
+
+    const nuevo =
+        document.getElementById(
+            "nuevoRecord"
+        );
+
+    if(esNuevoRecord){
+
+        nuevo.style.display =
+            "block";
+
+        sonido("record");
+
+    }else{
+
+        nuevo.style.display =
+            "none";
+    }
+
+    document.getElementById(
+        "resultado"
+    ).textContent =
+        "Puntuación: " + puntos;
+
+    mostrarListaFinal();
+
+    ocultarPantallas();
+
+    gameOverPantalla.classList.add(
+        "activa"
+    );
+}
+
+/* =====================================================
+   RÉCORDS
+===================================================== */
+
+let esNuevoRecord = false;
+
+function registrarPuntuacion(){
+
+    const puntuacionAnterior =
+        registros.length > 0
+        ? registros[registros.length-1]
+        : 0;
+
+    esNuevoRecord =
+        registros.length < 5 ||
+        puntos > puntuacionAnterior;
+
+    registros.push(puntos);
+
+    registros.sort(
+        (a,b)=>b-a
+    );
+
+    registros =
+        registros.slice(0,5);
+}
+
+function actualizarRecords(){
+
+    const lista =
+        document.getElementById(
+            "listaRecords"
+        );
+
+    lista.innerHTML = "";
+
+    if(registros.length === 0){
+
+        lista.innerHTML =
+            '<div class="sinRecord">Todavía no hay récords.</div>';
+
+        return;
+    }
+
+    registros.forEach(
+        (puntuacion,index)=>{
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "record";
+
+            let medalla = "";
+
+            if(index === 0)
+                medalla = "🥇";
+
+            else if(index === 1)
+                medalla = "🥈";
+
+            else if(index === 2)
+                medalla = "🥉";
+
+            else
+                medalla = "🏅";
+
+            div.innerHTML =
+                "<span>" +
+                medalla +
+                " #" +
+                (index+1) +
+                "</span>" +
+                "<strong>" +
+                puntuacion +
+                " ⭐</strong>";
+
+            lista.appendChild(div);
+        }
+    );
+}
+
+function mostrarListaFinal(){
+
+    const lista =
+        document.getElementById(
+            "listaRecordsFinal"
+        );
+
+    lista.innerHTML =
+        "<h3>🏆 Mejores puntuaciones</h3>";
+
+    registros.forEach(
+        (puntuacion,index)=>{
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "record";
+
+            div.innerHTML =
+                "<span>#" +
+                (index+1) +
+                "</span>" +
+                "<strong>" +
+                puntuacion +
+                " ⭐</strong>";
+
+            lista.appendChild(div);
+        }
+    );
+}
+
+/* =====================================================
+   EVITAR SCROLL
+===================================================== */
+
+document.addEventListener(
+    "touchmove",
+    function(e){
+
+        if(e.target.closest("#zonaControl")){
+            e.preventDefault();
+        }
+
+    },
+    {passive:false}
+);
+
+</script>
+
+</body>
+</html>
